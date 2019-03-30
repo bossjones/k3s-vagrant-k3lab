@@ -262,6 +262,8 @@ Vagrant.configure(2) do |config|
 
       vm_config.vm.provision 'shell', inline: $configureBox
 
+      vm_config.vm.provision :reload
+
 
       # # copy private key so hosts can ssh using key authentication (the script below sets permissions to 600)
       # config.vm.provision :file do |file|
