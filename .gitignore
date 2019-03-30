@@ -47,6 +47,7 @@ roles/yaegashi.blockinfile
 roles/zzet.rbenv
 roles/ANXS.build-essential
 roles/ANXS.git
+roles/k3s-ansible
 
 *.retry
 
