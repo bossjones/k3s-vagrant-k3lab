@@ -11,21 +11,22 @@ NON_ROOT_USER = 'vagrant'.freeze
 
 $fix_perm = <<SHELL
 sudo chmod 600 /home/vagrant/.ssh
-sudo chmod 400 /home/vagrant/.ssh/id_rsa
+sudo chmod 600 /home/vagrant/.ssh/id_rsa
 
 sudo mkdir -p /root/.ssh
 sudo chmod 600 /root/.ssh
 
 sudo cp /home/vagrant/.ssh/id_rsa /root/.ssh/id_rsa
-sudo chmod 400 /root/.ssh/id_rsa
+sudo chmod 600 /root/.ssh/id_rsa
 SHELL
 
-# This script to install k8s using kubeadm will get executed after a box is provisioned
-$configureBox = <<-SCRIPT
+
+$fix_ulimit = <<SHELL
+    set -x;
     # install docker v17.03
     # reason for not using docker provision is that it always installs latest version of the docker, but kubeadm requires 17.03 or older
-    apt-get update
-    apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+    sudo apt-get update
+    sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
     # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
     # add-apt-repository "deb https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
     # apt-get update && apt-get install -y docker-ce=$(apt-cache madison docker-ce | grep 17.03 | head -1 | awk '{print $3}')
@@ -39,7 +40,7 @@ $configureBox = <<-SCRIPT
     # apt-mark hold kubelet kubeadm kubectl
 
     # kubelet requires swap off
-    swapoff -a
+    sudo swapoff -a
 
     # keep swap off after reboot
     sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
@@ -54,15 +55,15 @@ $configureBox = <<-SCRIPT
               vim
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y python-six python-pip
 
-    modprobe ip_vs_wrr
-    modprobe ip_vs_rr
-    modprobe ip_vs_sh
-    modprobe ip_vs
-    modprobe nf_conntrack_ipv4
-    modprobe bridge
-    modprobe br_netfilter
+    sudo modprobe ip_vs_wrr
+    sudo modprobe ip_vs_rr
+    sudo modprobe ip_vs_sh
+    sudo modprobe ip_vs
+    sudo modprobe nf_conntrack_ipv4
+    sudo modprobe bridge
+    sudo modprobe br_netfilter
 
-    cat <<EOF >/etc/modules-load.d/k8s_ip_vs.conf
+    sudo cat <<EOF >/etc/modules-load.d/k8s_ip_vs.conf
 ip_vs_wrr
 ip_vs_rr
 ip_vs_sh
@@ -70,55 +71,62 @@ ip_vs
 nf_conntrack_ipv4
 EOF
 
-    cat <<EOF >/etc/modules-load.d/k8s_bridge.conf
+    sudo cat <<EOF >/etc/modules-load.d/k8s_bridge.conf
 bridge
 EOF
 
-    cat <<EOF >/etc/modules-load.d/k8s_br_netfilter.conf
+    sudo cat <<EOF >/etc/modules-load.d/k8s_br_netfilter.conf
 br_netfilter
 EOF
 
-    echo "* soft     nproc          500000" > /etc/security/limits.d/perf.conf
-    echo "* hard     nproc          500000" >> /etc/security/limits.d/perf.conf
-    echo "* soft     nofile         500000" >> /etc/security/limits.d/perf.conf
-    echo "* hard     nofile         500000"  >> /etc/security/limits.d/perf.conf
-    echo "root soft     nproc          500000" >> /etc/security/limits.d/perf.conf
-    echo "root hard     nproc          500000" >> /etc/security/limits.d/perf.conf
-    echo "root soft     nofile         500000" >> /etc/security/limits.d/perf.conf
-    echo "root hard     nofile         500000" >> /etc/security/limits.d/perf.conf
-    sed -i '/pam_limits.so/d' /etc/pam.d/sshd
-    echo "session    required   pam_limits.so" >> /etc/pam.d/sshd
-    sed -i '/pam_limits.so/d' /etc/pam.d/su
-    echo "session    required   pam_limits.so" >> /etc/pam.d/su
-    sed -i '/session required pam_limits.so/d' /etc/pam.d/common-session
-    echo "session required pam_limits.so" >> /etc/pam.d/common-session
-    sed -i '/session required pam_limits.so/d' /etc/pam.d/common-session-noninteractive
-    echo "session required pam_limits.so" >> /etc/pam.d/common-session-noninteractive
-    # NOTE: https://medium.com/@muhammadtriwibowo/set-permanently-ulimit-n-open-files-in-ubuntu-4d61064429a
-    # TODO: Put into playbook
-    # echo "2097152" | sudo tee /proc/sys/fs/file-max
+  sudo apt-get install -y conntrack ipset
 
-    apt-get install -y conntrack ipset
-
-    sudo sysctl -w vm.min_free_kbytes=1024000
-    sudo sync; sudo sysctl -w vm.drop_caches=3; sudo sync
+  sudo sysctl -w vm.min_free_kbytes=1024000
+  sudo sync; sudo sysctl -w vm.drop_caches=3; sudo sync
 
 
-    echo 1 >/sys/kernel/mm/ksm/run
-    echo 1000 >/sys/kernel/mm/ksm/sleep_millisecs
+  echo 1 | sudo tee /sys/kernel/mm/ksm/run
+  echo 1000 | sudo tee /sys/kernel/mm/ksm/sleep_millisecs
 
-    # SOURCE: https://blog.openai.com/scaling-kubernetes-to-2500-nodes/ ( VERY GOOD )
+  # SOURCE: https://blog.openai.com/scaling-kubernetes-to-2500-nodes/ ( VERY GOOD )
 
-    echo "vm.min_free_kbytes=1024000" | sudo tee -a /etc/sysctl.d/kube.conf
-    echo "net.ipv4.neigh.default.gc_thresh1 = 80000" | sudo tee -a /etc/sysctl.d/kube.conf
-    echo "net.ipv4.neigh.default.gc_thresh2 = 90000" | sudo tee -a /etc/sysctl.d/kube.conf
-    echo "net.ipv4.neigh.default.gc_thresh3 = 100000" | sudo tee -a /etc/sysctl.d/kube.conf
-    # echo "sys.kernel.mm.ksm.run = 1" | sudo tee -a /etc/sysctl.d/kube.conf
-    # echo "sys.kernel.mm.ksm.sleep_millisecs = 1000" | sudo tee -a /etc/sysctl.d/kube.conf
-    # echo "fs.file-max = 2097152" | sudo tee -a /etc/sysctl.d/kube.conf
-    sysctl -p
+  echo "vm.min_free_kbytes=1024000" | sudo tee -a /etc/sysctl.d/kube.conf
+  echo "net.ipv4.neigh.default.gc_thresh1 = 80000" | sudo tee -a /etc/sysctl.d/kube.conf
+  echo "net.ipv4.neigh.default.gc_thresh2 = 90000" | sudo tee -a /etc/sysctl.d/kube.conf
+  echo "net.ipv4.neigh.default.gc_thresh3 = 100000" | sudo tee -a /etc/sysctl.d/kube.conf
+  # echo "sys.kernel.mm.ksm.run = 1" | sudo tee -a /etc/sysctl.d/kube.conf
+  # echo "sys.kernel.mm.ksm.sleep_millisecs = 1000" | sudo tee -a /etc/sysctl.d/kube.conf
+  # echo "fs.file-max = 2097152" | sudo tee -a /etc/sysctl.d/kube.conf
+  sysctl -p
 
 
+  echo "* soft     nproc          500000" | sudo tee /etc/security/limits.d/perf.conf
+  echo "* hard     nproc          500000" | sudo tee -a /etc/security/limits.d/perf.conf
+  echo "* soft     nofile         500000" | sudo tee -a /etc/security/limits.d/perf.conf
+  echo "* hard     nofile         500000"  | sudo tee -a /etc/security/limits.d/perf.conf
+  echo "root soft     nproc          500000" | sudo tee -a /etc/security/limits.d/perf.conf
+  echo "root hard     nproc          500000" | sudo tee -a /etc/security/limits.d/perf.conf
+  echo "root soft     nofile         500000" | sudo tee -a /etc/security/limits.d/perf.conf
+  echo "root hard     nofile         500000" | sudo tee -a /etc/security/limits.d/perf.conf
+
+  sudo sed -i '/pam_limits.so/d' /etc/pam.d/sshd
+  echo "session    required   pam_limits.so" | sudo tee -a /etc/pam.d/sshd
+  sudo sed -i '/pam_limits.so/d' /etc/pam.d/su
+  echo "session    required   pam_limits.so" | sudo tee -a /etc/pam.d/su
+  sudo sed -i '/session required pam_limits.so/d' /etc/pam.d/common-session
+  echo "session required pam_limits.so" | sudo tee -a /etc/pam.d/common-session
+  sudo sed -i '/session required pam_limits.so/d' /etc/pam.d/common-session-noninteractive
+  echo "session required pam_limits.so" | sudo tee -a /etc/pam.d/common-session-noninteractive
+  # NOTE: https://medium.com/@muhammadtriwibowo/set-permanently-ulimit-n-open-files-in-ubuntu-4d61064429a
+  # TODO: Put into playbook
+  # echo "2097152" | sudo tee /proc/sys/fs/file-max
+SHELL
+
+
+
+
+# This script to install k8s using kubeadm will get executed after a box is provisioned
+$configureBox = <<-SCRIPT
     mkdir -p ~vagrant/dev
     git clone https://github.com/viasite-ansible/ansible-role-zsh ~/dev/ansible-role-zsh
     git clone https://github.com/bossjones/docker-kernel-ide ~/dev/docker-kernel-ide
@@ -136,6 +144,8 @@ EOF
 
     sudo apt-get -y install luajit luajit-5.1-dev
 
+    sudo chown vagrant:vagrant -R /usr/local/bin
+
     cd /usr/local/bin
     wget -O grv https://github.com/rgburke/grv/releases/download/v0.3.1/grv_v0.3.1_linux64
     chmod +x ./grv
@@ -149,17 +159,17 @@ EOF
 
     ### add packages (both necessary and convenient)
     echo Adding packages...
-    apt-get install -y gcc make ncurses-dev libssl-dev bc
+    sudo apt-get install -y gcc make ncurses-dev libssl-dev bc
     echo Adding packages for perf...
-    apt-get install -y flex bison libelf-dev libdw-dev libaudit-dev
+    sudo apt-get install -y flex bison libelf-dev libdw-dev libaudit-dev
     echo Adding packages for perf TUI...
-    apt-get install -y libnewt-dev libslang2-dev
+    sudo apt-get install -y libnewt-dev libslang2-dev
     echo Adding packages for convenience...
-    apt-get install -y sharutils sysstat bc
-    apt-get -y install etckeeper
+    sudo apt-get install -y sharutils sysstat bc
+    sudo apt-get -y install etckeeper
 
 
-    cat <<EOF >/etc/etckeeper/etckeeper.conf
+    sudo cat <<EOF >/etc/etckeeper/etckeeper.conf
 ## Ansible managed
 
 # The VCS to use.
@@ -205,7 +215,7 @@ PUSH_REMOTE=""
 EOF
 
     # /proc/sys/fs/inotify/max_user_watches
-    bash <(curl -Ss https://my-netdata.io/kickstart.sh) --dont-wait --non-interactive
+    # bash <(curl -Ss https://my-netdata.io/kickstart.sh) --dont-wait --non-interactive
 SCRIPT
 
 Vagrant.configure(2) do |config|
@@ -260,10 +270,11 @@ Vagrant.configure(2) do |config|
         vm_config.hostmanager.aliases = aliases
       end
 
-      vm_config.vm.provision 'shell', inline: $configureBox
+      vm_config.vm.provision 'shell', inline: $fix_ulimit
 
       vm_config.vm.provision :reload
 
+      vm_config.vm.provision 'shell', inline: $configureBox
 
       # # copy private key so hosts can ssh using key authentication (the script below sets permissions to 600)
       # config.vm.provision :file do |file|
