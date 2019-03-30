@@ -8,6 +8,18 @@ config_yml = YAML.load_file(File.open(__dir__ + '/vagrant-config.yml'))
 
 NON_ROOT_USER = 'vagrant'.freeze
 
+
+$fix_perm = <<SHELL
+sudo chmod 600 /home/vagrant/.ssh
+sudo chmod 400 /home/vagrant/.ssh/id_rsa
+
+sudo mkdir -p /root/.ssh
+sudo chmod 600 /root/.ssh
+
+sudo cp /home/vagrant/.ssh/id_rsa /root/.ssh/id_rsa
+sudo chmod 400 /root/.ssh/id_rsa
+SHELL
+
 # This script to install k8s using kubeadm will get executed after a box is provisioned
 $configureBox = <<-SCRIPT
     # install docker v17.03
@@ -249,6 +261,18 @@ Vagrant.configure(2) do |config|
       end
 
       vm_config.vm.provision 'shell', inline: $configureBox
+
+
+      # copy private key so hosts can ssh using key authentication (the script below sets permissions to 600)
+      config.vm.provision :file do |file|
+        file.source      = './keys/vagrant_id_rsa'
+        file.destination = '/home/vagrant/.ssh/id_rsa'
+      end
+
+      # fix permissions on private key file
+      config.vm.provision :shell, inline: $fix_perm
+
+
     end
   end
 end
