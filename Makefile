@@ -1,4 +1,7 @@
 
+PROJECT_ROOT_DIR=${shell pwd}
+
+
 download-roles:
 	ansible-galaxy install -r requirements.yml --roles-path ./roles/
 
@@ -24,3 +27,11 @@ local-clone-k3s-ansible:
 provision-ks3:
 	-ansible-playbook -v roles/k3s-ansible/site.yml -i inventory.ini
 	-ansible-playbook -v roles/k3s-ansible/site.yml -i inventory.ini
+
+
+multi-ssh-k3lab:
+	i2cssh -XF=$(PROJECT_ROOT_DIR)/ssh_config.k3lab.conf -Xi=~/.ssh/vagrant_id_rsa k3lab
+
+i2cssh-k3lab: multi-ssh-k3lab
+
+k3lab-ssh: multi-ssh-homelab

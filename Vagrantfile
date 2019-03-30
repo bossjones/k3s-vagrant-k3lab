@@ -252,7 +252,7 @@ Vagrant.configure(2) do |config|
         v.customize ['modifyvm', :id, '--cpus', settings[:cpu]]
       end
 
-      hostname_with_hyenalab_tld = "#{settings[:hostname]}.k3slab.com"
+      hostname_with_hyenalab_tld = "#{settings[:hostname]}.hyenalab.home"
 
       aliases = [hostname_with_hyenalab_tld, settings[:hostname]]
 
