@@ -14,54 +14,54 @@
     :id: 10
     :disk: "10GB"
 
-k3lab-node-01:
-  :hostname: "k3lab-node-01"
-  :name: "k3lab-node-01"
-  :type: "node"
-  :box: "ubuntu/bionic64"
-  :eth1: "192.168.2.34"
-  :ip: "192.168.2.34"
-  :mem: 1024
-  :ram: 1024
-  :cpu: 2
-  :id: 10
-  :disk: "10GB"
+  k3lab-node-01:
+    :hostname: "k3lab-node-01"
+    :name: "k3lab-node-01"
+    :type: "node"
+    :box: "ubuntu/bionic64"
+    :eth1: "192.168.2.34"
+    :ip: "192.168.2.34"
+    :mem: 1024
+    :ram: 1024
+    :cpu: 2
+    :id: 10
+    :disk: "10GB"
 
-k3lab-node-02:
-  :hostname: "k3lab-node-02"
-  :name: "k3lab-node-02"
-  :type: "node"
-  :box: "ubuntu/bionic64"
-  :eth1: "192.168.2.39"
-  :ip: "192.168.2.39"
-  :mem: 1024
-  :ram: 1024
-  :cpu: 2
-  :id: 10
-  :disk: "10GB"
+  k3lab-node-02:
+    :hostname: "k3lab-node-02"
+    :name: "k3lab-node-02"
+    :type: "node"
+    :box: "ubuntu/bionic64"
+    :eth1: "192.168.2.39"
+    :ip: "192.168.2.39"
+    :mem: 1024
+    :ram: 1024
+    :cpu: 2
+    :id: 10
+    :disk: "10GB"
 
-# k3lab-node-03:
-#   :hostname: "k3lab-node-03"
-#   :name: "k3lab-node-03"
-#   :type: "node"
-#   :box: "ubuntu/bionic64"
-#   :eth1: "192.168.2.16"
-#   :ip: "192.168.2.16"
-#   :mem: 1024
-#   :ram: 1024
-#   :cpu: 2
-#   :id: 10
-#   :disk: "10GB"
+  # k3lab-node-03:
+  #   :hostname: "k3lab-node-03"
+  #   :name: "k3lab-node-03"
+  #   :type: "node"
+  #   :box: "ubuntu/bionic64"
+  #   :eth1: "192.168.2.16"
+  #   :ip: "192.168.2.16"
+  #   :mem: 1024
+  #   :ram: 1024
+  #   :cpu: 2
+  #   :id: 10
+  #   :disk: "10GB"
 
-# k3lab-node-04:
-#   :hostname: "k3lab-node-04"
-#   :name: "k3lab-node-04"
-#   :type: "node"
-#   :box: "ubuntu/bionic64"
-#   :eth1: "192.168.2.32"
-#   :ip: "192.168.2.32"
-#   :mem: 1024
-#   :ram: 1024
-#   :cpu: 2
-#   :id: 10
-#   :disk: "10GB"
+  # k3lab-node-04:
+  #   :hostname: "k3lab-node-04"
+  #   :name: "k3lab-node-04"
+  #   :type: "node"
+  #   :box: "ubuntu/bionic64"
+  #   :eth1: "192.168.2.32"
+  #   :ip: "192.168.2.32"
+  #   :mem: 1024
+  #   :ram: 1024
+  #   :cpu: 2
+  #   :id: 10
+  #   :disk: "10GB"

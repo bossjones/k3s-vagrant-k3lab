@@ -263,14 +263,14 @@ Vagrant.configure(2) do |config|
       vm_config.vm.provision 'shell', inline: $configureBox
 
 
-      # copy private key so hosts can ssh using key authentication (the script below sets permissions to 600)
-      config.vm.provision :file do |file|
-        file.source      = './keys/vagrant_id_rsa'
-        file.destination = '/home/vagrant/.ssh/id_rsa'
-      end
+      # # copy private key so hosts can ssh using key authentication (the script below sets permissions to 600)
+      # config.vm.provision :file do |file|
+      #   file.source      = './keys/vagrant_id_rsa'
+      #   file.destination = '/home/vagrant/.ssh/id_rsa'
+      # end
 
-      # fix permissions on private key file
-      config.vm.provision :shell, inline: $fix_perm
+      # # fix permissions on private key file
+      # config.vm.provision :shell, inline: $fix_perm
 
 
     end
