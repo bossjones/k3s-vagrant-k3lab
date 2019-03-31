@@ -1,4 +1,21 @@
 ---
+- name: fix /etc/hosts
+  hosts: k3s-cluster
+  gather_facts: yes
+  become: yes
+  vars:
+    k3s_version: v0.3.0
+    ansible_user: vagrant
+    systemd_dir: /lib/systemd/system
+    master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
+  roles:
+    - role: boss-ansible-role-update-hosts
+      bossjones__user: vagrant
+      bossjones__group: vagrant
+      boss__update__hosts__hosts_file: /etc/hosts
+      boss__update__hosts__ansible_group: "k3s-cluster"
+      boss__update__hosts__networking_interface: "enp0s8"
+
 
 - hosts: k3s-cluster
   gather_facts: yes
@@ -10,6 +27,12 @@
     master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
   roles:
     - { role: download }
+    - role: boss-ansible-role-update-hosts
+      bossjones__user: vagrant
+      bossjones__group: vagrant
+      boss__update__hosts__hosts_file: /etc/hosts
+      boss__update__hosts__ansible_group: "k3s-cluster"
+      boss__update__hosts__networking_interface: "enp0s8"
 
 
 - hosts: master

@@ -216,6 +216,26 @@ EOF
 
     # /proc/sys/fs/inotify/max_user_watches
     # bash <(curl -Ss https://my-netdata.io/kickstart.sh) --dont-wait --non-interactive
+
+    sudo apt-get install ccze socat iptables htop -y
+
+
+    # kubectl
+    # curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+    # sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+    # sudo apt install kubectl -y
+    mkdir -p ~/.kube
+    cp -a /etc/rancher/k3s/k3s.yaml ~/.kube/config
+
+    # EXAMPLE USAGE:
+    # sudo k3s server &
+    # # Kubeconfig is written to /etc/rancher/k3s/k3s.yaml
+    # sudo k3s kubectl get node
+
+    # # On a different node run the below. NODE_TOKEN comes from /var/lib/rancher/k3s/server/node-token
+    # # on your server
+    # sudo k3s agent --server https://myserver:6443 --token ${NODE_TOKEN}
+
 SCRIPT
 
 Vagrant.configure(2) do |config|

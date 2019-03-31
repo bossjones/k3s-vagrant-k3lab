@@ -30,7 +30,7 @@
 # - src: https://github.com/bossjones/boss-ansible-role-ntp
 # - src: https://github.com/bossjones/boss-ansible-role-timezone
 # - src: https://github.com/bossjones/boss-ansible-role-tools
-# - src: https://github.com/bossjones/boss-ansible-role-update-hosts
+- src: https://github.com/bossjones/boss-ansible-role-update-hosts
 # - src: https://www.github.com/mrlesmithjr/ansible-logrotate
 # - src: https://www.github.com/mrlesmithjr/ansible-motd
 # - src: https://www.github.com/mrlesmithjr/ansible-netdata.git
