@@ -20,7 +20,7 @@ clone-k3s-ansible:
 	cp -avs /vagrant/site.yml ~/dev/k3s-ansible/site.yaml
 
 local-clone-k3s-ansible:
-	git clone https://github.com/itwars/k3s-ansible roles/k3s-ansible
+	[ ! -d "roles/k3s-ansible/.git" ] && git clone https://github.com/itwars/k3s-ansible roles/k3s-ansible || echo "already cloned k3s-ansible"
 	cp -av site.yml roles/k3s-ansible/site.yml
 	cp -av site.yml roles/k3s-ansible/site.yaml
 
@@ -35,3 +35,15 @@ multi-ssh-k3lab:
 i2cssh-k3lab: multi-ssh-k3lab
 
 k3lab-ssh: multi-ssh-homelab
+
+up:
+	vagrant up
+
+destroy:
+	vagrant destroy -f
+
+dev: up local-clone-k3s-ansible provision-ks3
+
+bootstrap: dev
+
+rebootstrap: destroy bootstrap
