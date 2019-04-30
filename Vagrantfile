@@ -29,7 +29,7 @@ $fix_ulimit = <<SHELL
     sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
     # curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
     # add-apt-repository "deb https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
-    # apt-get update && apt-get install -y docker-ce=$(apt-cache madison docker-ce | grep 17.03 | head -1 | awk '{print $3}')
+    # apt-get update && apt-get install -y docker-ce=$(apt-cache madison docker-ce | grep 18.09 | head -1 | awk '{print $3}')
     # apt-mark hold docker-ce
 
     # # run docker commands as vagrant user (sudo not required)
@@ -225,7 +225,7 @@ EOF
     # sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
     # sudo apt install kubectl -y
     mkdir -p ~/.kube
-    cp -a /etc/rancher/k3s/k3s.yaml ~/.kube/config
+    # cp -a /etc/rancher/k3s/k3s.yaml ~/.kube/config
 
     # EXAMPLE USAGE:
     # sudo k3s server &
