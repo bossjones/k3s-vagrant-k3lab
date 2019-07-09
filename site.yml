@@ -4,7 +4,7 @@
   gather_facts: yes
   become: yes
   vars:
-    k3s_version: v0.4.0
+    k3s_version: v0.6.1
     ansible_user: vagrant
     systemd_dir: /lib/systemd/system
     master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
@@ -21,7 +21,7 @@
   gather_facts: yes
   become: yes
   vars:
-    k3s_version: v0.4.0
+    k3s_version: v0.6.1
     ansible_user: vagrant
     systemd_dir: /lib/systemd/system
     master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
@@ -39,7 +39,7 @@
   gather_facts: yes
   become: yes
   vars:
-    k3s_version: v0.4.0
+    k3s_version: v0.6.1
     ansible_user: vagrant
     systemd_dir: /lib/systemd/system
     master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
@@ -50,7 +50,7 @@
   gather_facts: yes
   become: yes
   vars:
-    k3s_version: v0.4.0
+    k3s_version: v0.6.1
     ansible_user: vagrant
     systemd_dir: /lib/systemd/system
     master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"

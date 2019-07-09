@@ -31,6 +31,8 @@ $fix_ulimit = <<SHELL
     # add-apt-repository "deb https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
     # apt-get update && apt-get install -y docker-ce=$(apt-cache madison docker-ce | grep 18.09 | head -1 | awk '{print $3}')
     # apt-mark hold docker-ce
+    # curl -fsSL https://get.docker.com -o get-docker.sh
+    # sh get-docker.sh
 
     # # run docker commands as vagrant user (sudo not required)
     # usermod -aG docker vagrant
