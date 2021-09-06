@@ -1,0 +1,71 @@
+---
+- name: fix /etc/hosts
+  hosts: k3s-cluster
+  gather_facts: yes
+  become: yes
+  vars:
+    k3s_version: v1.21.4+k3s1
+    ansible_user: pi
+    systemd_dir: /lib/systemd/system
+    master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
+  roles:
+    - role: boss-ansible-role-update-hosts
+      bossjones__user: pi
+      bossjones__group: pi
+      boss__update__hosts__hosts_file: /etc/hosts
+      boss__update__hosts__ansible_group: "k3s-cluster"
+      boss__update__hosts__networking_interface: "ens33"
+
+
+- hosts: k3s-cluster
+  gather_facts: yes
+  become: yes
+  environment:
+    K3S_CLUSTER_SECRET: somethingtotallyrandom
+    K3S_KUBECONFIG_OUTPUT: /output/kubeconfig.yaml
+    K3S_KUBECONFIG_MODE: 666
+  vars:
+    k3s_version: v1.21.4+k3s1
+    ansible_user: pi
+    systemd_dir: /lib/systemd/system
+    master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
+  roles:
+    - { role: download }
+    - role: boss-ansible-role-update-hosts
+      bossjones__user: pi
+      bossjones__group: pi
+      boss__update__hosts__hosts_file: /etc/hosts
+      boss__update__hosts__ansible_group: "k3s-cluster"
+      boss__update__hosts__networking_interface: "ens33"
+
+
+- hosts: master
+  gather_facts: yes
+  become: yes
+  environment:
+    K3S_CLUSTER_SECRET: somethingtotallyrandom
+    K3S_KUBECONFIG_OUTPUT: /output/kubeconfig.yaml
+    K3S_KUBECONFIG_MODE: 666
+  vars:
+    k3s_version: v1.21.4+k3s1
+    ansible_user: pi
+    systemd_dir: /lib/systemd/system
+    master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
+  roles:
+    - { role: k3s/master }
+
+- hosts: node
+  gather_facts: yes
+  become: yes
+  environment:
+    K3S_CLUSTER_SECRET: somethingtotallyrandom
+    K3S_URL: https://server:6443
+    # Can also use K3S_TOKEN from /var/lib/rancher/k3s/server/node-token instead of K3S_CLUSTER_SECRET
+    #K3S_TOKEN: K13849a67fc385fd3c0fa6133a8649d9e717b0258b3b09c87ffc33dae362c12d8c0::node:2e373dca319a0525745fd8b3d8120d9c
+  vars:
+    k3s_version: v1.21.4+k3s1
+    ansible_user: pi
+    systemd_dir: /lib/systemd/system
+    master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['master'][0]) }}"
+  roles:
+    - { role: k3s/node }
